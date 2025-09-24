@@ -111,10 +111,10 @@ class InvestmentAnalyzer:
         analysis_text = str(result)
         
         # Parse the result into structured format
-        market_analysis = self._extract_section(analysis_text, "Market Analysis")
-        financial_metrics = self._extract_section(analysis_text, "Financial Metrics")
-        risk_assessment = self._extract_section(analysis_text, "Risk Assessment")
-        recommendations = self._extract_section(analysis_text, "Recommendations")
+        market_analysis = self._extract_section(analysis_text, "Market Analysis") or analysis_text
+        financial_metrics = self._extract_section(analysis_text, "Financial Metrics") or analysis_text
+        risk_assessment = self._extract_section(analysis_text, "Risk Assessment") or analysis_text  
+        recommendations = self._extract_section(analysis_text, "Recommendations") or analysis_text
         
         return StockAnalysisResult(
             company_symbols=companies,
@@ -155,10 +155,10 @@ class InvestmentAnalyzer:
         result = self.agents.research_analyst.do(ranking_task, model=self.agents.get_model_config())
         ranking_text = str(result)
         
-        ranked_companies = self._extract_section(ranking_text, "Company Rankings")
-        investment_rationale = self._extract_section(ranking_text, "Investment Rationale")
-        risk_evaluation = self._extract_section(ranking_text, "Risk Evaluation")
-        growth_potential = self._extract_section(ranking_text, "Growth Potential")
+        ranked_companies = self._extract_section(ranking_text, "Company Rankings") or ranking_text
+        investment_rationale = self._extract_section(ranking_text, "Investment Rationale") or ranking_text
+        risk_evaluation = self._extract_section(ranking_text, "Risk Evaluation") or ranking_text
+        growth_potential = self._extract_section(ranking_text, "Growth Potential") or ranking_text
         
         return InvestmentRanking(
             ranked_companies=ranked_companies,
@@ -200,10 +200,10 @@ class InvestmentAnalyzer:
         result = self.agents.investment_lead.do(portfolio_task, model=self.agents.get_model_config())
         portfolio_text = str(result)
         
-        allocation_strategy = self._extract_section(portfolio_text, "Allocation Strategy")
-        investment_thesis = self._extract_section(portfolio_text, "Investment Thesis")
-        risk_management = self._extract_section(portfolio_text, "Risk Management")
-        final_recommendations = self._extract_section(portfolio_text, "Final Recommendations")
+        allocation_strategy = self._extract_section(portfolio_text, "Allocation Strategy") or portfolio_text
+        investment_thesis = self._extract_section(portfolio_text, "Investment Thesis") or portfolio_text
+        risk_management = self._extract_section(portfolio_text, "Risk Management") or portfolio_text
+        final_recommendations = self._extract_section(portfolio_text, "Final Recommendations") or portfolio_text
         
         return PortfolioAllocation(
             allocation_strategy=allocation_strategy,
@@ -242,14 +242,9 @@ class InvestmentAnalyzer:
                     f.write("# Stock Analysis Report\n\n")
                     f.write(f"**Companies:** {result.stock_analysis.company_symbols}\n\n")
                     f.write(f"**Analysis Date:** {result.stock_analysis.analysis_date.isoformat()}\n\n")
-                    f.write("## Market Analysis\n")
+                    f.write("## Complete Analysis\n\n")
                     f.write(result.stock_analysis.market_analysis)
-                    f.write("\n\n## Financial Metrics\n")
-                    f.write(result.stock_analysis.financial_metrics)
-                    f.write("\n\n## Risk Assessment\n")
-                    f.write(result.stock_analysis.risk_assessment)
-                    f.write("\n\n## Recommendations\n")
-                    f.write(result.stock_analysis.recommendations)
+                    f.write("\n\n")
             
             # Save ranking report
             if result.investment_ranking:
@@ -257,14 +252,9 @@ class InvestmentAnalyzer:
                 with open(ranking_report_path, "w", encoding="utf-8") as f:
                     f.write("# Investment Ranking Report\n\n")
                     f.write(f"**Analysis Date:** {result.investment_ranking.analysis_date.isoformat()}\n\n")
-                    f.write("## Company Rankings\n")
+                    f.write("## Complete Ranking Analysis\n\n")
                     f.write(result.investment_ranking.ranked_companies)
-                    f.write("\n\n## Investment Rationale\n")
-                    f.write(result.investment_ranking.investment_rationale)
-                    f.write("\n\n## Risk Evaluation\n")
-                    f.write(result.investment_ranking.risk_evaluation)
-                    f.write("\n\n## Growth Potential\n")
-                    f.write(result.investment_ranking.growth_potential)
+                    f.write("\n\n")
             
             # Save portfolio report
             if result.portfolio_allocation:
@@ -272,14 +262,9 @@ class InvestmentAnalyzer:
                 with open(portfolio_report_path, "w", encoding="utf-8") as f:
                     f.write("# Investment Portfolio Report\n\n")
                     f.write(f"**Analysis Date:** {result.portfolio_allocation.analysis_date.isoformat()}\n\n")
-                    f.write("## Allocation Strategy\n")
+                    f.write("## Complete Portfolio Analysis\n\n")
                     f.write(result.portfolio_allocation.allocation_strategy)
-                    f.write("\n\n## Investment Thesis\n")
-                    f.write(result.portfolio_allocation.investment_thesis)
-                    f.write("\n\n## Risk Management\n")
-                    f.write(result.portfolio_allocation.risk_management)
-                    f.write("\n\n## Final Recommendations\n")
-                    f.write(result.portfolio_allocation.final_recommendations)
+                    f.write("\n\n")
             
             logger.info(f"Reports saved for analysis {request_id}")
             

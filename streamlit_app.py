@@ -122,63 +122,21 @@ def display_analysis_result(result: Dict[str, Any]):
         st.error(f"Analysis failed: {result.get('error_message', 'Unknown error')}")
         return
     
-    # Display analysis phases
+    # Display analysis phases with full content
     if result.get("stock_analysis"):
         with st.expander("📈 Stock Analysis", expanded=True):
             stock_analysis = result["stock_analysis"]
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader("Market Analysis")
-                st.write(stock_analysis.get("market_analysis", "No data available"))
-                
-                st.subheader("Risk Assessment")
-                st.write(stock_analysis.get("risk_assessment", "No data available"))
-            
-            with col2:
-                st.subheader("Financial Metrics")
-                st.write(stock_analysis.get("financial_metrics", "No data available"))
-                
-                st.subheader("Recommendations")
-                st.write(stock_analysis.get("recommendations", "No data available"))
+            st.markdown(stock_analysis.get("market_analysis", "No data available"))
     
     if result.get("investment_ranking"):
         with st.expander("🏆 Investment Ranking", expanded=True):
             ranking = result["investment_ranking"]
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader("Company Rankings")
-                st.write(ranking.get("ranked_companies", "No data available"))
-                
-                st.subheader("Risk Evaluation")
-                st.write(ranking.get("risk_evaluation", "No data available"))
-            
-            with col2:
-                st.subheader("Investment Rationale")
-                st.write(ranking.get("investment_rationale", "No data available"))
-                
-                st.subheader("Growth Potential")
-                st.write(ranking.get("growth_potential", "No data available"))
+            st.markdown(ranking.get("ranked_companies", "No data available"))
     
     if result.get("portfolio_allocation"):
         with st.expander("💼 Portfolio Allocation", expanded=True):
             portfolio = result["portfolio_allocation"]
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader("Allocation Strategy")
-                st.write(portfolio.get("allocation_strategy", "No data available"))
-                
-                st.subheader("Risk Management")
-                st.write(portfolio.get("risk_management", "No data available"))
-            
-            with col2:
-                st.subheader("Investment Thesis")
-                st.write(portfolio.get("investment_thesis", "No data available"))
-                
-                st.subheader("Final Recommendations")
-                st.write(portfolio.get("final_recommendations", "No data available"))
+            st.markdown(portfolio.get("allocation_strategy", "No data available"))
 
 
 def main():
@@ -223,6 +181,17 @@ def main():
                     st.divider()
             else:
                 st.write("No analyses yet")
+    
+    # Auto-load latest analysis if no current analysis
+    if not hasattr(st.session_state, 'current_analysis'):
+        analyses = list_analyses()
+        if analyses and len(analyses) > 0:
+            latest_analysis = analyses[0]  # Most recent
+            if latest_analysis.get("status") == "completed":
+                full_result = get_analysis(latest_analysis.get('request_id'))
+                if full_result:
+                    st.session_state.current_analysis = full_result
+                    st.success("✅ Loaded latest completed analysis")
     
     # Main content tabs
     tab1, tab2, tab3 = st.tabs(["🆕 New Analysis", "📋 Analysis History", "ℹ️ About"])
@@ -283,7 +252,7 @@ def main():
                         if result:
                             st.success(f"✅ Analysis created! ID: {result.get('request_id', 'Unknown')}")
                             st.session_state.current_analysis = result
-                            display_analysis_result(result)
+                            st.rerun()  # Refresh to show the new analysis
     
     with tab2:
         st.header("Analysis History")
@@ -335,6 +304,12 @@ def main():
             if hasattr(st.session_state, 'current_analysis'):
                 st.divider()
                 display_analysis_result(st.session_state.current_analysis)
+    
+    # Display current analysis at the bottom of all tabs
+    if hasattr(st.session_state, 'current_analysis'):
+        st.divider()
+        st.header("📊 Current Analysis Results")
+        display_analysis_result(st.session_state.current_analysis)
     
     with tab3:
         st.header("About AI Investment Report Generator")
