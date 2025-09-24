@@ -2,3 +2,12 @@ upsonic
 requests
 asyncpg
 aiosqlite
+fastapi
+uvicorn[standard]
+streamlit
+pydantic
+pydantic-settings
+python-dotenv
+python-multipart
+aiofiles
+httpx
