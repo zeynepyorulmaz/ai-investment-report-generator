@@ -1,0 +1,4 @@
+upsonic
+requests
+asyncpg
+aiosqlite
