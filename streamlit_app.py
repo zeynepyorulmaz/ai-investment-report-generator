@@ -213,9 +213,13 @@ def main():
         col1, col2 = st.columns([2, 1])
         
         with col1:
+            # Get default value from session state if available
+            default_companies = getattr(st.session_state, 'selected_companies', '')
+            
             # Company input
             companies_input = st.text_input(
                 "Enter company symbols (comma-separated)",
+                value=default_companies,
                 placeholder="e.g., AAPL, MSFT, GOOGL",
                 help="Enter 1-10 company stock symbols separated by commas"
             )
@@ -228,13 +232,14 @@ def main():
             )
         
         with col2:
-            st.write("**Example Scenarios:**")
+            st.write("**Quick Select Scenarios:**")
             for i, scenario in enumerate(example_scenarios, 1):
-                if st.button(f"{i}. {scenario}", key=f"example_{i}"):
+                if st.button(f"{i}. {scenario}", key=f"example_{i}", use_container_width=True):
                     st.session_state.selected_companies = scenario
+                    st.rerun()  # Refresh to populate the text field
             
-            if hasattr(st.session_state, 'selected_companies'):
-                companies_input = st.session_state.selected_companies
+            if hasattr(st.session_state, 'selected_companies') and st.session_state.selected_companies:
+                st.info(f"💡 Last selected: {st.session_state.selected_companies}")
         
         # Create analysis button
         if st.button("🚀 Start Analysis", type="primary", disabled=not companies_input):
@@ -242,7 +247,7 @@ def main():
                 companies = [c.strip().upper() for c in companies_input.split(",") if c.strip()]
                 
                 if len(companies) == 0:
-                    st.error("Please enter at least one company symbol")
+                    st.error("Please enter company symbols or select a scenario")
                 elif len(companies) > 10:
                     st.error("Maximum 10 companies allowed per analysis")
                 else:
@@ -253,6 +258,8 @@ def main():
                             st.success(f"✅ Analysis created! ID: {result.get('request_id', 'Unknown')}")
                             st.session_state.current_analysis = result
                             st.rerun()  # Refresh to show the new analysis
+            else:
+                st.warning("Please enter company symbols or select a scenario")
     
     with tab2:
         st.header("Analysis History")
