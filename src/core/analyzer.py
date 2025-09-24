@@ -110,18 +110,13 @@ class InvestmentAnalyzer:
         result = self.agents.stock_analyst.do(analysis_task, model=self.agents.get_model_config())
         analysis_text = str(result)
         
-        # Parse the result into structured format
-        market_analysis = self._extract_section(analysis_text, "Market Analysis") or analysis_text
-        financial_metrics = self._extract_section(analysis_text, "Financial Metrics") or analysis_text
-        risk_assessment = self._extract_section(analysis_text, "Risk Assessment") or analysis_text  
-        recommendations = self._extract_section(analysis_text, "Recommendations") or analysis_text
-        
+        # Use the full AI response for all fields to ensure content is preserved
         return StockAnalysisResult(
             company_symbols=companies,
-            market_analysis=market_analysis,
-            financial_metrics=financial_metrics,
-            risk_assessment=risk_assessment,
-            recommendations=recommendations
+            market_analysis=analysis_text,
+            financial_metrics=analysis_text,
+            risk_assessment=analysis_text,
+            recommendations=analysis_text
         )
     
     async def _rank_investments(self, stock_analysis: StockAnalysisResult) -> InvestmentRanking:
@@ -155,16 +150,12 @@ class InvestmentAnalyzer:
         result = self.agents.research_analyst.do(ranking_task, model=self.agents.get_model_config())
         ranking_text = str(result)
         
-        ranked_companies = self._extract_section(ranking_text, "Company Rankings") or ranking_text
-        investment_rationale = self._extract_section(ranking_text, "Investment Rationale") or ranking_text
-        risk_evaluation = self._extract_section(ranking_text, "Risk Evaluation") or ranking_text
-        growth_potential = self._extract_section(ranking_text, "Growth Potential") or ranking_text
-        
+        # Use the full AI response for all fields to ensure content is preserved
         return InvestmentRanking(
-            ranked_companies=ranked_companies,
-            investment_rationale=investment_rationale,
-            risk_evaluation=risk_evaluation,
-            growth_potential=growth_potential
+            ranked_companies=ranking_text,
+            investment_rationale=ranking_text,
+            risk_evaluation=ranking_text,
+            growth_potential=ranking_text
         )
     
     async def _create_portfolio_allocation(self, ranking_analysis: InvestmentRanking) -> PortfolioAllocation:
@@ -200,16 +191,12 @@ class InvestmentAnalyzer:
         result = self.agents.investment_lead.do(portfolio_task, model=self.agents.get_model_config())
         portfolio_text = str(result)
         
-        allocation_strategy = self._extract_section(portfolio_text, "Allocation Strategy") or portfolio_text
-        investment_thesis = self._extract_section(portfolio_text, "Investment Thesis") or portfolio_text
-        risk_management = self._extract_section(portfolio_text, "Risk Management") or portfolio_text
-        final_recommendations = self._extract_section(portfolio_text, "Final Recommendations") or portfolio_text
-        
+        # Use the full AI response for all fields to ensure content is preserved
         return PortfolioAllocation(
-            allocation_strategy=allocation_strategy,
-            investment_thesis=investment_thesis,
-            risk_management=risk_management,
-            final_recommendations=final_recommendations
+            allocation_strategy=portfolio_text,
+            investment_thesis=portfolio_text,
+            risk_management=portfolio_text,
+            final_recommendations=portfolio_text
         )
     
     def _extract_section(self, text: str, section_name: str) -> str:
