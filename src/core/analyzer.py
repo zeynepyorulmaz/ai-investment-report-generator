@@ -88,14 +88,21 @@ class InvestmentAnalyzer:
         analysis_task = Task(f"""
         {message}
 
-        Please conduct a comprehensive analysis of the following companies: {companies}
+        CRITICAL INSTRUCTION: You MUST analyze ONLY these specific companies using their EXACT stock symbols: {companies}
 
-        For each company, provide:
+        Please conduct a comprehensive analysis of ONLY the following companies: {companies}
+
+        For EACH of these specific companies ({companies}), provide:
         1. Current market position and financial metrics
         2. Recent performance and analyst recommendations
         3. Industry trends and competitive landscape
         4. Risk factors and growth potential
         5. News impact and market sentiment
+        
+        IMPORTANT: 
+        - Use ONLY the company symbols provided: {companies}
+        - Do NOT use generic names like "Company A", "Tech Inc.", etc.
+        - Reference each company by its actual stock symbol (e.g., AAPL for Apple, MSFT for Microsoft)
         
         Companies to analyze: {companies}
         """)
@@ -120,9 +127,9 @@ class InvestmentAnalyzer:
     async def _rank_investments(self, stock_analysis: StockAnalysisResult) -> InvestmentRanking:
         """Phase 2: Investment potential ranking"""
         ranking_task = Task(f"""
-        Based on the comprehensive stock analysis below, please rank these specific companies by investment potential: {stock_analysis.company_symbols}
+        Based on the comprehensive stock analysis below, please rank these EXACT companies by investment potential: {stock_analysis.company_symbols}
         
-        COMPANIES TO RANK: {stock_analysis.company_symbols}
+        MANDATORY: ONLY rank these specific companies: {stock_analysis.company_symbols}
         
         STOCK ANALYSIS:
         - Market Analysis: {stock_analysis.market_analysis}
@@ -130,13 +137,19 @@ class InvestmentAnalyzer:
         - Risk Assessment: {stock_analysis.risk_assessment}
         - Initial Recommendations: {stock_analysis.recommendations}
         
-        IMPORTANT: Use the actual company names/symbols ({stock_analysis.company_symbols}) in your ranking, not generic Company A/B/C labels.
+        CRITICAL REQUIREMENTS:
+        - Use ONLY the actual company symbols: {stock_analysis.company_symbols}
+        - Do NOT create fictional companies or use generic names
+        - Reference each company by its stock ticker (e.g., NVDA, AMD, INTC)
+        - Rank ALL and ONLY the companies listed: {stock_analysis.company_symbols}
         
         Please provide:
-        1. Detailed ranking of companies from best to worst investment potential
-        2. Investment rationale for each company
-        3. Risk evaluation and mitigation strategies
-        4. Growth potential assessment
+        1. Detailed ranking of THESE EXACT companies ({stock_analysis.company_symbols}) from best to worst investment potential
+        2. Investment rationale for each of these specific companies
+        3. Risk evaluation and mitigation strategies for each company
+        4. Growth potential assessment for each company
+        
+        Remember: Analyze ONLY {stock_analysis.company_symbols} - no other companies!
         """)
         
         result = self.agents.research_analyst.do(ranking_task, model=self.agents.get_model_config())
@@ -157,25 +170,31 @@ class InvestmentAnalyzer:
     async def _create_portfolio_allocation(self, ranking_analysis: InvestmentRanking) -> PortfolioAllocation:
         """Phase 3: Portfolio allocation strategy"""
         portfolio_task = Task(f"""
-        Based on the investment ranking and analysis below, create a strategic portfolio allocation ONLY for the companies that were analyzed.
+        Based on the investment ranking and analysis below, create a strategic portfolio allocation for EXACTLY these companies.
         
-        CRITICAL: 
-        - ONLY allocate to the companies mentioned in the ranking analysis
-        - Use the actual company names from the ranking analysis, not generic Company A/B/C labels
-        - Do NOT include other companies not mentioned in the analysis
-        - Ensure all allocations total 100% across ONLY the analyzed companies
+        MANDATORY CONSTRAINTS: 
+        - Allocate ONLY to the companies from the ranking analysis
+        - Use the EXACT company stock symbols, not generic names
+        - Do NOT create or mention any other companies
+        - Allocations must total EXACTLY 100%
+        - Reference companies by their stock tickers (e.g., NVDA, AMD, INTC)
         
-        INVESTMENT RANKING:
+        COMPANIES TO ALLOCATE (and ONLY these):
+        From the ranking analysis: {ranking_analysis.ranked_companies}
+        
+        INVESTMENT RANKING DATA:
         - Company Rankings: {ranking_analysis.ranked_companies}
         - Investment Rationale: {ranking_analysis.investment_rationale}
         - Risk Evaluation: {ranking_analysis.risk_evaluation}
         - Growth Potential: {ranking_analysis.growth_potential}
         
-        Please provide:
-        1. Specific allocation percentages for each company (must total 100%)
-        2. Investment thesis and strategic rationale
-        3. Risk management approach
-        4. Final actionable recommendations
+        REQUIRED OUTPUT:
+        1. Specific allocation percentages for EACH company mentioned in the rankings (must total exactly 100%)
+        2. Investment thesis for EACH specific company
+        3. Risk management approach for the portfolio
+        4. Final actionable recommendations for THESE EXACT companies
+        
+        IMPORTANT: Use ONLY the companies mentioned in the ranking analysis above. Do not invent new companies!
         """)
         
         result = self.agents.investment_lead.do(portfolio_task, model=self.agents.get_model_config())
